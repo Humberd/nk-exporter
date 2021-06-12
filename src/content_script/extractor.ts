@@ -4,3 +4,8 @@ export interface PhotoMetadata {
   author: string;
   date: string;
 }
+
+export interface ExtractorResult {
+  metadata: PhotoMetadata[]
+  nextUrlRequest?: string
+}

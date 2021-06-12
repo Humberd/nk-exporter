@@ -1,47 +1,55 @@
 import {
   CurrentUserMetadata,
   extractCurrentUserProfileMetadata,
-} from "./data-extractors";
-import { prefixStorageKeyName } from "./storage";
+} from './data-extractors';
+import { prefixStorageKeyName } from './storage';
 import { GalleryExtractor } from './gallery-extractor';
-import { PhotoMetadata } from './extractor';
+import { ExtractorResult, PhotoMetadata } from './extractor';
 
 export function content_script_init(): void {
   const currentUserProfile = initCurrentUserProfile();
 
-  const extractors = [new GalleryExtractor()]
+  const extractors = [new GalleryExtractor()];
 
-  const pathname = location.pathname
+  const url = new URL(location.href);
 
-  const photoMetadata: PhotoMetadata[] = []
+  let extractorResult: ExtractorResult | undefined;
 
   for (let extractor of extractors) {
-    if (extractor.testView(pathname)) {
-      photoMetadata.push(...extractor.extract())
+    if (extractor.testView(url)) {
+      extractorResult = extractor.extract(url);
       break;
     }
   }
 
-  console.log(photoMetadata);
+  if (!extractorResult) {
+    console.log(`Not extractor found for url: ${url}`);
+    return
+  }
+
+  console.log(extractorResult);
+  if (extractorResult.nextUrlRequest) {
+    location.href = extractorResult.nextUrlRequest
+  }
 
 }
 
 function initCurrentUserProfile(): CurrentUserMetadata {
   const currentUserProfileFromStorage = JSON.parse(
-    localStorage.getItem(prefixStorageKeyName("currentUserProfile")) as string
+      localStorage.getItem(prefixStorageKeyName('currentUserProfile')) as string,
   );
   if (currentUserProfileFromStorage) {
     console.log(
-      "User already exists in storage: ",
-      currentUserProfileFromStorage
+        'User already exists in storage: ',
+        currentUserProfileFromStorage,
     );
     return currentUserProfileFromStorage;
   }
 
   const newProfile = extractCurrentUserProfileMetadata();
   localStorage.setItem(
-    prefixStorageKeyName("currentUserProfile"),
-    JSON.stringify(newProfile)
+      prefixStorageKeyName('currentUserProfile'),
+      JSON.stringify(newProfile),
   );
   return newProfile;
 }
