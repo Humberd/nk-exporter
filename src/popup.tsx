@@ -1,17 +1,27 @@
-import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
+import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
+import {
+  receiveMessage,
+  sendMessageRequest,
+} from './commication/message-utils';
 
 const Popup = () => {
+  const [isExtracting, setIsExtracting] = useState(false);
   const [count, setCount] = useState(0);
   const [currentURL, setCurrentURL] = useState<string>();
 
   useEffect(() => {
-    chrome.browserAction.setBadgeText({ text: count.toString() });
-  }, [count]);
+    return receiveMessage((message, sender, sendResponse) => {
+      switch (message.type) {
+        case 'extraction_started':
+          setIsExtracting(true);
+          break;
+        case 'extraction_stopped':
+          setIsExtracting(false);
+          break;
+      }
 
-  useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      setCurrentURL(tabs[0].url);
+      sendResponse();
     });
   }, []);
 
@@ -22,36 +32,40 @@ const Popup = () => {
         chrome.tabs.sendMessage(
           tab.id,
           {
-            color: "#555555",
+            color: '#555555',
           },
           (msg) => {
-            console.log("result message:", msg);
+            console.log('result message:', msg);
           }
         );
       }
     });
   };
 
+  const startExtraction = () => {
+    sendMessageRequest({
+      type: 'extraction_start',
+    });
+  };
+
+  const stopExtraction = () => {
+    sendMessageRequest({
+      type: 'extraction_stop',
+    });
+  };
+
   return (
     <>
-      <ul style={{ minWidth: "700px" }}>
-        <li>Current URL: {currentURL}</li>
-        <li>Current Time: {new Date().toLocaleTimeString()}</li>
-      </ul>
-      <button
-        onClick={() => setCount(count + 1)}
-        style={{ marginRight: "5px" }}
-      >
-        count up
-      </button>
-      <button onClick={changeBackground}>change background</button>
+      {!isExtracting && (
+        <button onClick={startExtraction}>Rozpocznij export</button>
+      )}
+      {isExtracting && <button onClick={stopExtraction}>Zakończ</button>}
     </>
   );
 };
-
 ReactDOM.render(
   <React.StrictMode>
     <Popup />
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById('root')
 );

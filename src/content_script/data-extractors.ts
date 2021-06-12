@@ -1,7 +1,7 @@
 export interface CurrentUserMetadata {
-  profileId: string
-  profileUrl: string,
-  fullName: string,
+  profileId: string;
+  profileUrl: string;
+  fullName: string;
 }
 
 export function extractCurrentUserProfileMetadata(): CurrentUserMetadata {
@@ -10,14 +10,14 @@ export function extractCurrentUserProfileMetadata(): CurrentUserMetadata {
     throw Error(`Expected link element to be 1, but were: ${elements.length}`);
   }
 
-  const profileUrl = elements[0].getAttribute('href')
+  const profileUrl = elements[0].getAttribute('href');
   if (!profileUrl) {
-    throw Error("profileUrl is null")
+    throw Error('profileUrl is null');
   }
 
   return {
     profileUrl: profileUrl,
-    profileId: profileUrl.split("/")[2],
-    fullName: elements[0].textContent ?? ""
+    profileId: profileUrl.split('/')[2],
+    fullName: elements[0].textContent ?? '',
   };
 }

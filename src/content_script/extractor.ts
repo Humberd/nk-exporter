@@ -6,6 +6,6 @@ export interface PhotoMetadata {
 }
 
 export interface ExtractorResult {
-  metadata: PhotoMetadata[]
-  nextUrlRequest?: string
+  metadata: PhotoMetadata[];
+  nextUrlRequest?: string;
 }
