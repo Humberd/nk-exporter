@@ -3,8 +3,28 @@ import {
   extractCurrentUserProfileMetadata,
 } from "./data-extractors";
 import { prefixStorageKeyName } from "./storage";
+import { GalleryExtractor } from './gallery-extractor';
+import { PhotoMetadata } from './extractor';
 
-let currentUserProfile: CurrentUserMetadata;
+export function content_script_init(): void {
+  const currentUserProfile = initCurrentUserProfile();
+
+  const extractors = [new GalleryExtractor()]
+
+  const pathname = location.pathname
+
+  const photoMetadata: PhotoMetadata[] = []
+
+  for (let extractor of extractors) {
+    if (extractor.testView(pathname)) {
+      photoMetadata.push(...extractor.extract())
+      break;
+    }
+  }
+
+  console.log(photoMetadata);
+
+}
 
 function initCurrentUserProfile(): CurrentUserMetadata {
   const currentUserProfileFromStorage = JSON.parse(
@@ -24,8 +44,4 @@ function initCurrentUserProfile(): CurrentUserMetadata {
     JSON.stringify(newProfile)
   );
   return newProfile;
-}
-
-export function content_script_init(): void {
-  currentUserProfile = initCurrentUserProfile();
 }
