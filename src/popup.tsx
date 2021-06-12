@@ -7,8 +7,6 @@ import {
 
 const Popup = () => {
   const [isExtracting, setIsExtracting] = useState(false);
-  const [count, setCount] = useState(0);
-  const [currentURL, setCurrentURL] = useState<string>();
 
   useEffect(() => {
     return receiveMessage((message, sender, sendResponse) => {
@@ -22,6 +20,12 @@ const Popup = () => {
       }
 
       sendResponse();
+    });
+  }, []);
+
+  useEffect(() => {
+    sendMessageRequest({ type: 'is_extraction_started' }, response => {
+      setIsExtracting(!!response)
     });
   }, []);
 

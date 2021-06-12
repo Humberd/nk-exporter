@@ -5,6 +5,7 @@ export type MessageRequest =
   | ExtractionStarted
   | ExtractionStop
   | ExtractionStopped
+  | IsExtractionStarted
   | PhotoMetadataBatchExtracted;
 
 export interface ExtractionStart {
@@ -21,6 +22,10 @@ export interface ExtractionStop {
 
 export interface ExtractionStopped {
   type: 'extraction_stopped';
+}
+
+export interface IsExtractionStarted {
+  type: 'is_extraction_started';
 }
 
 export interface PhotoMetadataBatchExtracted {
