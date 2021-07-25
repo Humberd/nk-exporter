@@ -36,6 +36,10 @@ function handleExtractionStart(): void {
     state.isExtractionStarted = true;
     state.tabId = tab.id;
     sendMessageRequest({ type: 'extraction_started' });
+    setTimeout(() => {
+      const port = chrome.tabs.connect(tab.id!,  {name: 'nk-extractor-background-connection'})
+      port.postMessage("Hello from background")
+    }, 1000)
   });
 
 }
